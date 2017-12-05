@@ -1,0 +1,18 @@
+{
+  "name": "trakt-micropub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^4.0.1",
+    "micropub-helper": "^1.3.3",
+    "nconf": "^0.9.1",
+    "trakt.tv": "^6.0.2",
+    "trakt.tv-images": "^5.1.1"
+  }
+}
