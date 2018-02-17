@@ -15,7 +15,8 @@ let micropub = new Micropub({
   state: Date.now(),
 });
 
-nconf.argv()
+nconf
+  .argv()
   .env()
   .file({ file: __dirname + '/config.json' });
 
@@ -46,7 +47,7 @@ questions(micropub)
     micropub.options.tokenEndpoint = nconf.get('micropub:tokenEndpoint');
     getHistory(lastDate);
   })
-  .catch((err) => console.log(err));
+  .catch(err => console.log(err));
 
 function getHistory(after = false, page = 1) {
   let options = {};
@@ -56,10 +57,11 @@ function getHistory(after = false, page = 1) {
   if (page) {
     options.page = page;
   }
-  trakt.sync.history.get(options)
-    .then((watched) => {
+  trakt.sync.history
+    .get(options)
+    .then(watched => {
       if (watched.data && watched.data.length) {
-        watched.data.forEach((watch) => postWatch(watch));
+        watched.data.forEach(watch => postWatch(watch));
         if (watched.pagination && page < watched.pagination['page-count']) {
           getHistory(after, page + 1)
             .then(res => console.log(res))
@@ -80,31 +82,37 @@ function postWatch(watch) {
           published: [new Date(watch.watched_at)],
           'mp-syndicate-to': nconf.get('micropub:syndicateTo'),
           trakt: watch,
-        }
+        },
       };
 
       let imageSearch = null;
-    
+
       if (watch.type == 'episode') {
-        post.properties.summary = `📺 Watched ${watch.show.title} Episode ${watch.episode.number} Season ${watch.episode.season}: ${watch.episode.title}`;
+        post.properties.summary = [
+          `📺 Watched ${watch.show.title} Episode ${
+            watch.episode.number
+          } Season ${watch.episode.season}: ${watch.episode.title}`,
+        ];
         post.properties.category.push('watch--tv');
         imageSearch = {
           tmdb: watch.show.ids.tmdb,
           imdb: watch.show.ids.imdb,
           tvdb: watch.show.ids.tvdb,
-          type: 'show', 
+          type: 'show',
         };
       } else if (watch.type == 'movie') {
-        post.properties.summary = `🎬 Watched ${watch.movie.title} (${watch.movie.year})`;
+        post.properties.summary = [
+          `🎬 Watched ${watch.movie.title} (${watch.movie.year})`,
+        ];
         post.properties.category.push('watch--movie');
         imageSearch = {
           tmdb: watch.movie.ids.tmdb,
           imdb: watch.movie.ids.imdb,
           tvdb: watch.movie.ids.tvdb,
-          type: 'movie', 
+          type: 'movie',
         };
       }
-    
+
       if (Date.parse(watch.watched_at) > lastDate) {
         lastDate = Date.parse(watch.watched_at);
         lastId = watch.id;
@@ -113,13 +121,14 @@ function postWatch(watch) {
         nconf.save();
       }
 
-      trakt.images.get(imageSearch)
-        .then((image) => {
+      trakt.images
+        .get(imageSearch)
+        .then(image => {
           if (image.poster) {
             post.properties.photo = [image.poster];
           }
           if (image.background) {
-            post.properties.featured = [image.background]
+            post.properties.featured = [image.background];
           }
           post.properties.trakt.image = image;
           return micropub.create(post);
