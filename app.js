@@ -81,7 +81,8 @@ function postWatch(watch) {
           category: ['watch'],
           published: [new Date(watch.watched_at)],
           'mp-syndicate-to': nconf.get('micropub:syndicateTo'),
-          trakt: watch,
+          visibility: ['unlisted'],
+          trakt: [watch],
         },
       };
 
@@ -130,7 +131,7 @@ function postWatch(watch) {
           if (image.background) {
             post.properties.featured = [image.background];
           }
-          post.properties.trakt.image = image;
+          post.properties.trakt[0].image = image;
           return micropub.create(post);
         })
         .then(res => resolve(res))
