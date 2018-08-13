@@ -63,7 +63,7 @@ function getHistory(after = false, page = 1) {
       if (watched.data && watched.data.length) {
         watched.data.forEach(watch => postWatch(watch));
         if (watched.pagination && page < watched.pagination['page-count']) {
-          getHistory(after, page + 1)
+          this(after, page + 1)
             .then(res => console.log(res))
             .catch(err => console.log(err));
         }
