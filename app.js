@@ -79,7 +79,7 @@ function postWatch(watch) {
         type: ['h-entry'],
         properties: {
           category: ['watch'],
-          published: [new Date(watch.watched_at)],
+          created: [new Date(watch.watched_at)],
           'mp-syndicate-to': nconf.get('micropub:syndicateTo'),
           visibility: ['unlisted'],
           trakt: [watch],
@@ -95,6 +95,19 @@ function postWatch(watch) {
           } Season ${watch.episode.season}: ${watch.episode.title}`,
         ];
         post.properties.category.push('watch--tv');
+        post.properties['watch-of'] = [
+          'https://trakt.tv/shows/' + watch.show.ids.slug,
+        ];
+        if (watch.episode) {
+          if (watch.episode.season) {
+            post.properties['watch-of'][0] +=
+              '/seasons/' + watch.episode.season;
+          }
+          if (watch.episode.number) {
+            post.properties['watch-of'][0] +=
+              '/episodes/' + watch.episode.number;
+          }
+        }
         imageSearch = {
           tmdb: watch.show.ids.tmdb,
           imdb: watch.show.ids.imdb,
@@ -106,6 +119,9 @@ function postWatch(watch) {
           `🎬 Watched ${watch.movie.title} (${watch.movie.year})`,
         ];
         post.properties.category.push('watch--movie');
+        post.properties['watch-of'] = [
+          'https://trakt.tv/movies/' + watch.movie.ids.slug,
+        ];
         imageSearch = {
           tmdb: watch.movie.ids.tmdb,
           imdb: watch.movie.ids.imdb,
